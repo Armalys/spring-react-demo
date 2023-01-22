@@ -6,32 +6,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 @Controller
 public class PositionController {
-    private final AircraftRepository repository;
+    private final PositionService service;
     private final RSocketRequester requester;
-    private WebClient client =
-            WebClient.create("http://localhost:7634/aircraft");
 
-    public PositionController(AircraftRepository repository, RSocketRequester requester) {
-        this.repository = repository;
+    public PositionController(PositionService service, RSocketRequester requester) {
+        this.service = service;
         this.requester = requester;
     }
 
     // HTTP endpoint, HTTP requester (previously created)
     @GetMapping("/aircraft")
     public String getCurrentAircraftPositions(Model model) {
-        Flux<Aircraft> aircraftFlux = repository.deleteAll()
-                .thenMany(client.get()
-                        .retrieve()
-                        .bodyToFlux(Aircraft.class)
-                        .filter(plane -> !plane.getReg().isEmpty())
-                        .flatMap(repository::save));
+        model.addAttribute("currentPositions", service.getAllAircraft());
 
-        model.addAttribute("currentPositions", aircraftFlux);
         return "positions";
     }
 
