@@ -27,7 +27,6 @@ public class PositionController {
     @GetMapping("/aircraft")
     public String getCurrentAircraftPositions(Model model) {
         model.addAttribute("currentPositions", service.getAllAircraft());
-
         return "positions";
     }
 
@@ -44,7 +43,6 @@ public class PositionController {
     @GetMapping("acpos/search")
     public Publisher<Aircraft>
     searchForACPosition(@RequestParam Map<String, String> searchParams) {
-
         if (!searchParams.isEmpty()) {
             Map.Entry<String, String> setToSearch =
                     searchParams.entrySet().iterator().next();
